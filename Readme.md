@@ -29,7 +29,7 @@ Hugsql-ghosts needs an active cider connection to work as the query parsing is d
 
 ## Acknowledgement
 
-This is simply an adaption of [yesql-ghosts](https://github.com/magnars/yesql-ghosts/blob/master/README.md) by Magnar Sveen so most of the credit must go to him.
+This is an adaption of [yesql-ghosts](https://github.com/magnars/yesql-ghosts) by Magnar Sveen so most of the credit must go to him.
 
 ## License
 

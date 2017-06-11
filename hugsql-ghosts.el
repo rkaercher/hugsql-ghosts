@@ -83,9 +83,9 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
 (defun hugsql-ghosts--format-query-fns (query-fns)
   (s-join "\n" (-map 'hugsql-ghosts--format-query query-fns)))
 
-(defconst hugsql-ghosts--clojure-eval-code-template "(map 
-(fn [[fname {:keys [meta]}]] 
-    (list (name fname) (mapcat (fn [[kw value]] [kw value]) meta))) 
+(defconst hugsql-ghosts--clojure-eval-code-template "(map
+(fn [[fname {:keys [meta]}]]
+    (list (name fname) (mapcat (fn [[kw value]] [kw value]) meta)))
 (hugsql.core/%s \"%s\"))")
 
 (defconst hugsql-ghosts--clojure-db-fn-name "map-of-db-fns")
@@ -120,7 +120,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
     (while (hugsql-ghosts--display-next-queries))))
 
 (defun hugsql-ghosts-auto-show-ghosts ()
-  "Hook function for automatically showing the overlay in cider mode and redisplaying them after each save.  Can be configured by customizing the  hugsql-ghosts-show-ghosts-automatically variable."
+  "Hook function for automatically showing the overlay in cider mode and redisplaying them after each save.  Can be configured by customizing the 'hugsql-ghosts-show-ghosts-automatically' variable."
   (when (and cider-mode hugsql-ghosts-show-ghosts-automatically)
     (hugsql-ghosts-display-query-ghosts)))
 

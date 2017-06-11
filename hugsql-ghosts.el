@@ -67,21 +67,25 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
       (delete-overlay it))))
 
 (defun hugsql-ghosts--fontify-ghost (string)
+  "Add font attributes to the provided STRING."
   (set-text-properties 0 (length string) `(face 'hugsql-ghosts-defn) string)
   string)
 
 (defun hugsql-ghosts--insert-overlay (content)
+  "Insert the overlay with the provided CONTENT at point."
   (let ((o (make-overlay (point) (point) nil nil t)))
     (overlay-put o 'type 'hugsql-ghosts)
     (overlay-put o 'before-string (hugsql-ghosts--fontify-ghost (concat content "\n")))))
 
-(defun hugsql-ghosts--format-query (query-meta)
-  (-let [(name (&plist :doc doc)) query-meta]
+(defun hugsql-ghosts--format-query (query-metadata)
+  "Format a single query fn for display using the provided QUERY-METADATA."
+  (-let [(name (&plist :doc doc)) query-metadata]
     (if (and hugsql-ghosts-show-docstrings doc (not (s-blank? doc)))
 	(format "(defn %s [db ...]%s\"%s\")"  name (if hugsql-ghosts-newline-before-docstrings "\n" " ") doc)
       (format "(defn %s [db ...])" name))))
 
 (defun hugsql-ghosts--format-query-fns (query-fns)
+  "Make a single string divided by newlines from the proviced QUERY-FNS metadata."
   (s-join "\n" (-map 'hugsql-ghosts--format-query query-fns)))
 
 (defconst hugsql-ghosts--clojure-eval-code-template "(map
@@ -93,12 +97,14 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
 (defconst hugsql-ghosts--clojure-sqlvec-fn-name "map-of-sqlvec-fns")
 
 (defun hugsql-ghosts--find-next-occurrence ()
+  "Move to the next occurrence of a sql file import and return its type or nil if none is found."
   (if (search-forward "(hugsql/def-db-fns \"" nil t)
       :hugsql-db-fn
     (when (search-forward "(hugsql/def-sqlvec-fns \"" nil t)
       :hugsql-sqlvec-fn)))
 
 (defun hugsql-ghosts--display-next-queries ()
+  "Search and display the queries of the next sql file include from point."
   (-when-let (def-fns-found (hugsql-ghosts--find-next-occurrence))
     (let* ((path (thing-at-point 'filename))
 	   (clojure-fn-name (if (eq :hugsql-db-fn def-fns-found)

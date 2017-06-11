@@ -38,11 +38,11 @@
   "Display ghostly hugsql defqueries inline."
   :group 'tools)
 
-(defcustom hugsql-ghosts-show-docstrings nil
+(defcustom hugsql-ghosts-show-docstrings 't
   "A non-nil value if you want to show query docstrings."
   :group 'hugsql-ghosts)
 
-(defcustom hugsql-ghosts-newline-before-docstrings 't
+(defcustom hugsql-ghosts-newline-before-docstrings nil
   "A non-nil value if you want to print a newline before query docstrings."
   :group 'hugsql-ghosts)
 
@@ -52,7 +52,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
 `hugsql-ghosts-remove-overlays' to show and hide them."
   :group 'hugsql-ghosts)
 
-(defface hugsql-ghosts-defn-face
+(defface hugsql-ghosts-defn
   '((t :foreground "#686868" :background "#181818"))
   "Face for hugsql ghost defns inserted when in cider-mode."
   :group 'hugsql-ghosts)
@@ -64,35 +64,51 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
     (when (eq (overlay-get it 'type) 'hugsql-ghosts)
       (delete-overlay it))))
 
-(defun hugsql-ghosts-fontify-ghost (string)
-  (set-text-properties 0 (length string) `(face 'hugsql-ghosts-defn-face) string)
+(defun hugsql-ghosts--fontify-ghost (string)
+  (set-text-properties 0 (length string) `(face 'hugsql-ghosts-defn) string)
   string)
 
-(defun hugsql-ghosts-insert-overlay (content)
+(defun hugsql-ghosts--insert-overlay (content)
   (let ((o (make-overlay (point) (point) nil nil t)))
     (overlay-put o 'type 'hugsql-ghosts)
-    (overlay-put o 'before-string (hugsql-ghosts-fontify-ghost (concat content "\n")))))
+    (overlay-put o 'before-string (hugsql-ghosts--fontify-ghost (concat content "\n")))))
 
-(defun hugsql-ghosts-format-query (query-meta)
+(defun hugsql-ghosts--format-query (query-meta)
   (-let [(name (&plist :doc doc)) query-meta]
     (if (and hugsql-ghosts-show-docstrings doc (not (s-blank? doc)))
-	(format "(defn %s []%s\"%s\")"  name (if hugsql-ghosts-newline-before-docstrings "\n" " ") doc)
-      (format "(defn %s [])" name))))
+	(format "(defn %s [db ...]%s\"%s\")"  name (if hugsql-ghosts-newline-before-docstrings "\n" " ") doc)
+      (format "(defn %s [db ...])" name))))
 
-(defun hugsql-ghosts-format-query-fns (query-fns)
-  (s-join "\n" (-map 'hugsql-ghosts-format-query query-fns)))
+(defun hugsql-ghosts--format-query-fns (query-fns)
+  (s-join "\n" (-map 'hugsql-ghosts--format-query query-fns)))
 
-(defun hugsql-ghosts-display-next-queries ()
-  (when (or (search-forward "(hugsql/def-db-fns \"" nil t)
-	    (search-forward "(hugsql/def-sqlvec-fns \"" nil t))
+(defconst hugsql-ghosts--clojure-eval-code-template "(map 
+(fn [[fname {:keys [meta]}]] 
+    (list (name fname) (mapcat (fn [[kw value]] [kw value]) meta))) 
+(hugsql.core/%s \"%s\"))")
+
+(defconst hugsql-ghosts--clojure-db-fn-name "map-of-db-fns")
+(defconst hugsql-ghosts--clojure-sqlvec-fn-name "map-of-sqlvec-fns")
+
+(defun hugsql-ghosts--find-next-occurrence ()
+  (if (search-forward "(hugsql/def-db-fns \"" nil t)
+      :hugsql-db-fn
+    (when (search-forward "(hugsql/def-sqlvec-fns \"" nil t)
+      :hugsql-sqlvec-fn)))
+
+(defun hugsql-ghosts--display-next-queries ()
+  (-when-let (def-fns-found (hugsql-ghosts--find-next-occurrence))
     (let* ((path (thing-at-point 'filename))
-	   (clojure-cmd "(map (fn [[fname {:keys [meta]}]] (list (name fname) (mapcat (fn [[kw value]] [kw value]) meta))) (hugsql.core/map-of-db-fns \"%s\"))")
-	   (cider-result (cider-nrepl-sync-request:eval (format clojure-cmd path)))
+	   (clojure-fn-name (if (eq :hugsql-db-fn def-fns-found)
+				hugsql-ghosts--clojure-db-fn-name
+			      hugsql-ghosts--clojure-sqlvec-fn-name))
+	   (clojure-cmd (format hugsql-ghosts--clojure-eval-code-template clojure-fn-name path))
+	   (cider-result (cider-nrepl-sync-request:eval clojure-cmd))
            (db-fns (read (nrepl-dict-get cider-result "value"))))
       (when db-fns
         (end-of-line)
         (forward-char 1)
-	(hugsql-ghosts-insert-overlay (hugsql-ghosts-format-query-fns db-fns))))))
+	(hugsql-ghosts--insert-overlay (hugsql-ghosts--format-query-fns db-fns))))))
 
 (defun hugsql-ghosts-display-query-ghosts ()
   "Displays an overlay after (hugsql/def-db-fns ...) or (hugsql/def-sqlvec-fns ...) showing the names and docstrings of the generated functions from that file."
@@ -100,7 +116,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
   (hugsql-ghosts-remove-overlays)
   (save-excursion
     (goto-char (point-min))
-    (while (hugsql-ghosts-display-next-queries))))
+    (while (hugsql-ghosts--display-next-queries))))
 
 (defun hugsql-ghosts-auto-show-ghosts ()
   "Hook function for automatically showing the overlay in cider mode and redisplaying them after each save.  Can be configured by customizing the  hugsql-ghosts-show-ghosts-automatically variable."

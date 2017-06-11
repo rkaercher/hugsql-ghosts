@@ -3,7 +3,7 @@
 Displays ghostly [hugsql](https://www.hugsql.org) defns of your queries in your cider buffers.
 
 <img src="screenshot.png">
-(It'll look better with your color theme of course.)
+*(It'll look better with your color theme of course.)*
 
 ## Installation
 
@@ -22,10 +22,19 @@ Then put hugsql-ghosts.el in your elisp path and require it in your .emacs:
 Ghosts should now appear in all cider buffers which have either `(hugsql/def-db-fns "path/to/your/queries.sql")` or `(hugsql/def-sqlvec-fns "path/to/your/queries.sql")`.
 Please note, that this only works if you've required `hugsql.core` as `hugsql` in your clojure source.
 
+**Hugsql-ghosts needs an active cider connection to work as the query parsing is done by the hugsql library itself via cider.**
 
-If you want the function doc strings to be displayed also you can set `hugsql-ghosts-show-descriptions` to `t`.
 
-Hugsql-ghosts needs an active cider connection to work as the query parsing is done by hugsql itself via cider.
+## Usage / Configuration
+
+If you don't want the function doc strings to be displayed you can set `hugsql-ghosts-show-descriptions` to `nil`.
+By default the doc strings will be displayed on the same line as the `defun`, if you don't like that or don't have enough horizontal screen real-estate, you can set `hugsql-ghosts-newline-before-docstrings` to `t`.
+To prevent ghosts from being automatically displayed in all cider buffers using hugsql, simply seit `hugsql-ghosts-show-ghosts-automatically` to `nil`.
+
+The display of ghotsts can be triggered manually by calling `hugsql-ghosts-display-query-ghosts`, to get rid of them simply call `hugsql-ghosts-remove-overlays`.
+
+Finally, you can customize the face `hugsql-ghosts-defn` to adapt the overlay appearance to your liking.
+
 
 ## Acknowledgement
 

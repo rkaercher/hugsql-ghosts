@@ -3,6 +3,7 @@
 ;; Copyright (C) 2017 Roland Kaercher <roland.kaercher@gmail.com>, heavily based on yesql ghosts by Magnar Sveen <magnars@gmail.com>
 
 ;; Author: Roland Kaercher <roland.kaercher@gmail.com>
+;; URL: https://github.com/rkaercher/hugsql-ghosts
 ;; Version: 0.1.0
 ;; Package-Requires: ((s "1.9.0") (dash "2.10.0") (cider "0.14.0"))
 

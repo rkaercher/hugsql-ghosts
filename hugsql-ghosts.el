@@ -58,6 +58,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
   "Face for hugsql ghost defns inserted when in cider-mode."
   :group 'hugsql-ghosts)
 
+;;;###autoload
 (defun hugsql-ghosts-remove-overlays ()
   "Remove all hugsql ghost overlays from the current buffer."
   (interactive)
@@ -120,6 +121,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
     (goto-char (point-min))
     (while (hugsql-ghosts--display-next-queries))))
 
+;;;###autoload
 (defun hugsql-ghosts-auto-show-ghosts ()
   "Hook function for automatically showing the overlay in cider mode and redisplaying them after each save.  Can be configured by customizing the 'hugsql-ghosts-show-ghosts-automatically' variable."
   (when (and cider-mode hugsql-ghosts-show-ghosts-automatically)

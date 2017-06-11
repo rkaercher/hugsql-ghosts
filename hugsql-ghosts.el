@@ -111,6 +111,7 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
         (forward-char 1)
 	(hugsql-ghosts--insert-overlay (hugsql-ghosts--format-query-fns db-fns))))))
 
+;;;###autoload
 (defun hugsql-ghosts-display-query-ghosts ()
   "Displays an overlay after (hugsql/def-db-fns ...) or (hugsql/def-sqlvec-fns ...) showing the names and docstrings of the generated functions from that file."
   (interactive)
@@ -124,7 +125,9 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
   (when (and cider-mode hugsql-ghosts-show-ghosts-automatically)
     (hugsql-ghosts-display-query-ghosts)))
 
+;;;###autoload
 (add-hook 'cider-mode-hook 'hugsql-ghosts-auto-show-ghosts)
+;;;###autoload
 (add-hook 'after-save-hook 'hugsql-ghosts-auto-show-ghosts)
 
 (provide 'hugsql-ghosts)

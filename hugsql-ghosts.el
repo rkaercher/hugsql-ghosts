@@ -4,7 +4,7 @@
 
 ;; Author: Roland Kaercher <roland.kaercher@gmail.com>
 ;; URL: https://github.com/rkaercher/hugsql-ghosts
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Package-Requires: ((s "1.9.0") (dash "2.10.0") (cider "0.14.0"))
 
 ;; This program is free software; you can redistribute it and/or
@@ -45,12 +45,6 @@
 
 (defcustom hugsql-ghosts-newline-before-docstrings nil
   "A non-nil value if you want to print a newline before query docstrings."
-  :group 'hugsql-ghosts)
-
-(defcustom hugsql-ghosts-show-ghosts-automatically 't
-  "A non-nil value if you want to show the ghosts when a buffer loads.
-Otherwise, use `hugsql-ghosts-display-query-ghosts' and
-`hugsql-ghosts-remove-overlays' to show and hide them."
   :group 'hugsql-ghosts)
 
 (defface hugsql-ghosts-defn
@@ -128,15 +122,10 @@ Otherwise, use `hugsql-ghosts-display-query-ghosts' and
     (while (hugsql-ghosts--display-next-queries))))
 
 ;;;###autoload
-(defun hugsql-ghosts-auto-show-ghosts ()
-  "Hook function for automatically showing the overlay in cider mode and redisplaying them after each save.  Can be configured by customizing the 'hugsql-ghosts-show-ghosts-automatically' variable."
-  (when (and cider-mode hugsql-ghosts-show-ghosts-automatically)
-    (hugsql-ghosts-display-query-ghosts)))
-
-;;;###autoload
-(add-hook 'cider-mode-hook 'hugsql-ghosts-auto-show-ghosts)
-;;;###autoload
-(add-hook 'after-save-hook 'hugsql-ghosts-auto-show-ghosts)
+(defun hugsql-ghosts-install-hook ()
+  "Add a buffer local hook that refreshes the ghosts whenever the cider buffer is reloaded."
+  (hugsql-ghosts-display-query-ghosts)
+  (add-hook 'cider-file-loaded-hook 'hugsql-ghosts-display-query-ghosts nil 't))
 
 (provide 'hugsql-ghosts)
 ;;; hugsql-ghosts.el ends here

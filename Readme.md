@@ -3,25 +3,40 @@
 Displays ghostly [hugsql](https://www.hugsql.org) defns of your queries in your cider buffers.
 
 <img src="screenshot.png">
+
 *(It'll look better with your color theme of course.)*
 
 ## Installation
 
-As hugsql-ghosts is not (yet) available via elpa, you should install the following packages (preferably through elpa):
+### MELPA
+As hugsql-ghosts is available via [MELPA](https://melpa.org/), you can install it via:
+
+<kbd>M-x</kbd> `package-install` <kbd>RET</kbd> `hugsql-ghosts` <kbd>RET</kbd>
+
+
+### Manual
+Should you wish to install it manually, you should install the
+following packages:
 
  - <a href="https://github.com/magnars/s.el">s.el</a>
  - <a href="https://github.com/magnars/dash.el">dash.el</a>
  - <a href="https://github.com/clojure-emacs/cider">cider</a>
 
-Then put hugsql-ghosts.el in your elisp path, require it in your .emacs and add it to the cider file reload hook:
+Then put hugsql-ghosts.el in your elisp path and require it in your .emacs:
 
-```cl
+```emacs-lisp
 (require 'hugsql-ghosts)
+```
+
+### Hook
+In either case, add it to the [CIDER](https://github.com/clojure-emacs/cider) mode hook:
+
+```emacs-lisp
 (add-hook 'cider-mode-hook 'hugsql-ghosts-install-hook)
 ```
 
-Ghosts should now appear in all cider buffers which have either `(hugsql/def-db-fns "path/to/your/queries.sql")` or `(hugsql/def-sqlvec-fns "path/to/your/queries.sql")`.
-Please note that this only works if you've required `hugsql.core` as `hugsql` in your clojure source. Furthermore, changes in sql are only reflected after you reload your cider buffer (C-c C-k).
+Ghosts should now appear in all CIDER buffers which have either `(hugsql/def-db-fns "path/to/your/queries.sql")` or `(hugsql/def-sqlvec-fns "path/to/your/queries.sql")`.
+Please note that this only works if you've required `hugsql.core` as `hugsql` in your clojure source. Furthermore, changes in sql are only reflected after you reload your CIDER buffer (C-c C-k).
 
 **Hugsql-ghosts needs an active cider connection to work as the query parsing is done by the hugsql library itself via cider.**
 

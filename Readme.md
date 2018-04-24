@@ -1,6 +1,6 @@
 # hugsql-ghosts
 
-Displays ghostly [hugsql](https://www.hugsql.org) defns of your queries in your cider buffers.
+Displays [hugsql](https://www.hugsql.org) defns of your queries as an overlay in your cider buffers.
 
 <img src="screenshot.png">
 
@@ -35,18 +35,22 @@ In either case, add it to the [CIDER](https://github.com/clojure-emacs/cider) mo
 (add-hook 'cider-mode-hook 'hugsql-ghosts-install-hook)
 ```
 
-Ghosts should now appear in all CIDER buffers which have either `(hugsql/def-db-fns "path/to/your/queries.sql")` or `(hugsql/def-sqlvec-fns "path/to/your/queries.sql")`.
+Overlays should now appear in all CIDER buffers which have any of `(hugsql/def-db-fns "path/to/your/queries.sql")`, `(hugsql/def-sqlvec-fns "path/to/your/queries.sql")` or `(conman/bind-connection *your-db-con* "path/to/your/queries.sql")`.
 Please note that this only works if you've required `hugsql.core` as `hugsql` in your clojure source. Furthermore, changes in sql are only reflected after you reload your CIDER buffer (C-c C-k).
 
 **Hugsql-ghosts needs an active cider connection to work as the query parsing is done by the hugsql library itself via cider.**
 
 
-## Usage / Configuration
+## Usage
+
+The display of ghosts can be triggered manually by calling `hugsql-ghosts-display-query-ghosts`, to get rid of them simply call `hugsql-ghosts-remove-overlays`.
+
+To jump to the SQL file referenced you can bind `hugsql-ghosts-jump-sql-file` to a suitable key. It'll ask which one to jump to if there are multiple files referenced.
+
+## Customization
 
 If you don't want the function doc strings to be displayed you can set `hugsql-ghosts-show-descriptions` to `nil`.
 By default the doc strings will be displayed on the same line as the `defun`, if you don't like that or don't have enough horizontal screen real-estate, you can set `hugsql-ghosts-newline-before-docstrings` to `t`.
-
-The display of ghosts can be triggered manually by calling `hugsql-ghosts-display-query-ghosts`, to get rid of them simply call `hugsql-ghosts-remove-overlays`.
 
 Finally, you can customize the face `hugsql-ghosts-defn` to adapt the overlay appearance to your liking.
 
@@ -57,7 +61,7 @@ This is an adaption of [yesql-ghosts](https://github.com/magnars/yesql-ghosts) b
 
 ## License
 
-Copyright (C) 2017 Roland Kaercher
+Copyright (C) 2017 - 2018 Roland Kaercher
 
 Authors: Roland Kaercher <roland.kaercher@gmail.com> based on work by Magnar Sveen <magnars@gmail.com>
 

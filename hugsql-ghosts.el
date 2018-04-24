@@ -1,10 +1,11 @@
-;;; hugsql-ghosts.el --- Display ghostly hugsql defqueries inline
+;;; hugsql-ghosts.el --- Display hugsql defqueries in clojure code as an overlay.
 
 ;; Copyright (C) 2017 Roland Kaercher <roland.kaercher@gmail.com>, heavily based on yesql ghosts by Magnar Sveen <magnars@gmail.com>
 
 ;; Author: Roland Kaercher <roland.kaercher@gmail.com>
 ;; URL: https://github.com/rkaercher/hugsql-ghosts
-;; Version: 0.1.1
+;; Package-Version: 20180423.2219
+;; Version: 0.1.2
 ;; Package-Requires: ((s "1.9.0") (dash "2.10.0") (cider "0.14.0"))
 
 ;; This program is free software; you can redistribute it and/or
@@ -36,21 +37,24 @@
 (require 'thingatpt)
 
 (defgroup hugsql-ghosts nil
-  "Display ghostly hugsql defqueries inline."
+  "Display hugsql defqueries as overlay in clojure code."
   :group 'tools)
 
 (defcustom hugsql-ghosts-show-docstrings 't
   "A non-nil value if you want to show query docstrings."
-  :group 'hugsql-ghosts)
+  :group 'hugsql-ghosts
+  :type 'boolean)
 
 (defcustom hugsql-ghosts-newline-before-docstrings nil
   "A non-nil value if you want to print a newline before query docstrings."
-  :group 'hugsql-ghosts)
+  :group 'hugsql-ghosts
+  :type 'boolean)
 
 (defface hugsql-ghosts-defn
   '((t :foreground "#686868" :background "#181818"))
-  "Face for hugsql ghost defns inserted when in cider-mode."
-  :group 'hugsql-ghosts)
+  "Face for hugsql defns overlayed when in cider-mode."
+  :group 'hugsql-ghosts
+  :type 'face)
 
 ;;;###autoload
 (defun hugsql-ghosts-remove-overlays ()
@@ -94,8 +98,10 @@
   "Move to the next occurrence of a sql file import and return its type or nil if none is found."
   (if (search-forward "(hugsql/def-db-fns \"" nil t)
       :hugsql-db-fn
-    (when (search-forward "(hugsql/def-sqlvec-fns \"" nil t)
-      :hugsql-sqlvec-fn)))
+    (if (search-forward "(hugsql/def-sqlvec-fns \"" nil t)
+	:hugsql-sqlvec-fn
+      (when (re-search-forward "\(conman\/bind-connection\s[^\s]*\s\"" nil t)
+	:hugsql-db-fn))))
 
 (defun hugsql-ghosts--display-next-queries ()
   "Search and display the queries of the next sql file include from point."
@@ -114,7 +120,7 @@
 
 ;;;###autoload
 (defun hugsql-ghosts-display-query-ghosts ()
-  "Displays an overlay after (hugsql/def-db-fns ...) or (hugsql/def-sqlvec-fns ...) showing the names and docstrings of the generated functions from that file."
+  "Displays an overlay after (hugsql/def-db-fns ...) or (hugsql/def-sqlvec-fns ...) or (conman/bind-connection ...) showing the names and docstrings of the generated functions from that file."
   (interactive)
   (hugsql-ghosts-remove-overlays)
   (save-excursion
@@ -126,6 +132,18 @@
   "Add a buffer local hook that refreshes the ghosts whenever the cider buffer is reloaded."
   (hugsql-ghosts-display-query-ghosts)
   (add-hook 'cider-file-loaded-hook 'hugsql-ghosts-display-query-ghosts nil 't))
+
+;;;###autoload
+(defun hugsql-ghosts-jump-sql-file ()
+  "Jumps to the references SQL file, provides a choice when there are multiple references."
+  (interactive)
+  (goto-char (point-min))
+  (let* ((path nil))
+    (while (hugsql-ghosts--find-next-occurrence)
+      (push (thing-at-point 'filename) path))
+    (if (> (length path) 1)
+	(cider-find-resource (completing-read "Jump to SQL file:" path))
+      (cider-find-resource (car path)))))
 
 (provide 'hugsql-ghosts)
 ;;; hugsql-ghosts.el ends here

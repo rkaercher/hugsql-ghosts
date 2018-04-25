@@ -4,7 +4,7 @@
 
 ;; Author: Roland Kaercher <roland.kaercher@gmail.com>
 ;; URL: https://github.com/rkaercher/hugsql-ghosts
-;; Package-Version: 20180423.2219
+;; Package-Version: 20180425.1329
 ;; Version: 0.1.3
 ;; Package-Requires: ((s "1.9.0") (dash "2.10.0") (cider "0.14.0"))
 

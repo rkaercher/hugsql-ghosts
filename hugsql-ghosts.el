@@ -5,7 +5,7 @@
 ;; Author: Roland Kaercher <roland.kaercher@gmail.com>
 ;; URL: https://github.com/rkaercher/hugsql-ghosts
 ;; Package-Version: 20180423.2219
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Package-Requires: ((s "1.9.0") (dash "2.10.0") (cider "0.14.0"))
 
 ;; This program is free software; you can redistribute it and/or
@@ -53,8 +53,7 @@
 (defface hugsql-ghosts-defn
   '((t :foreground "#686868" :background "#181818"))
   "Face for hugsql defns overlayed when in cider-mode."
-  :group 'hugsql-ghosts
-  :type 'face)
+  :group 'hugsql-ghosts)
 
 ;;;###autoload
 (defun hugsql-ghosts-remove-overlays ()
